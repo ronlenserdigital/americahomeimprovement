@@ -64,7 +64,7 @@ function revealItems(selector, staggerDelay = 0.08) {
   });
 }
 
-/* ── SECTION HEADER REVEALS (fade up, not invisible by default) ── */
+/* ── SECTION HEADER REVEALS ── */
 gsap.utils.toArray('.section-hdr').forEach(el => {
   gsap.from(el, {
     opacity: 0,
@@ -121,15 +121,33 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
-/* ── FORM FEEDBACK ── */
+/* ── FORM — Web3Forms ── */
 const form = document.getElementById('contact-form');
 if (form) {
-  form.addEventListener('submit', () => {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
     const btn = form.querySelector('.form-submit');
-    if (btn) {
-      btn.style.opacity = '0.7';
-      btn.style.pointerEvents = 'none';
-      btn.innerHTML = 'Sending… <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+    const originalHTML = btn.innerHTML;
+
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
+    btn.innerHTML = 'Sending…';
+
+    const data = new FormData(form);
+    const res  = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: data });
+    const json = await res.json();
+
+    if (json.success) {
+      btn.style.opacity = '1';
+      btn.style.background = '#16a34a';
+      btn.style.borderColor = '#16a34a';
+      btn.innerHTML = "Request Sent! We'll be in touch. ✓";
+      form.reset();
+    } else {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      btn.innerHTML = originalHTML;
+      alert('Something went wrong. Please call us at 410-758-7943.');
     }
   });
 }
