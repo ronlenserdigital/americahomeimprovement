@@ -490,9 +490,7 @@
           <div class="form-wrap">
             <h3 class="font-oswald font-600 text-white text-xl mb-6 tracking-wide">ESTIMATE REQUEST</h3>
             <form id="contact-form" class="flex flex-col gap-4">
-              <input type="hidden" name="access_key" value="ee89a481-bc2e-4c7b-8385-703546c6bed9
-
-">
+              <input type="hidden" name="access_key" value="ee89a481-bc2e-4c7b-8385-703546c6bed9">
               <input type="hidden" name="subject" value="New Estimate Request - America Affordable Home Improvement">
               <input type="hidden" name="from_name" value="America Affordable Website">
               <input type="checkbox" name="botcheck" style="display:none">
@@ -535,7 +533,51 @@
                 Send Request
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
+              <div id="form-result" class="font-barlow text-sm text-center mt-1" style="display:none;"></div>
             </form>
+            <script>
+              (function(){
+                var form = document.getElementById('contact-form');
+                var result = document.getElementById('form-result');
+                var btn = form.querySelector('.form-submit');
+                form.addEventListener('submit', function(e){
+                  e.preventDefault();
+                  btn.style.opacity = '0.7';
+                  btn.style.pointerEvents = 'none';
+                  btn.textContent = 'Sending...';
+                  var data = Object.fromEntries(new FormData(form));
+                  fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+                    body: JSON.stringify(data)
+                  })
+                  .then(function(r){ return r.json(); })
+                  .then(function(res){
+                    if(res.success){
+                      result.textContent = 'Request sent. We will be in touch within one business day.';
+                      result.style.color = '#4ade80';
+                      result.style.display = 'block';
+                      form.reset();
+                    } else {
+                      result.textContent = 'Something went wrong. Please call 410-758-7943.';
+                      result.style.color = '#f87171';
+                      result.style.display = 'block';
+                    }
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                    btn.textContent = 'Send Request';
+                  })
+                  .catch(function(){
+                    result.textContent = 'Network error. Please call 410-758-7943.';
+                    result.style.color = '#f87171';
+                    result.style.display = 'block';
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                    btn.textContent = 'Send Request';
+                  });
+                });
+              })();
+            </script>
           </div>
         </div>
 
